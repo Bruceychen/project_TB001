@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: project_tb001
+  profiles:
+    active: postgres
+#    active: h2
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+    open-in-view: false
+
+server:
+  port: 8080

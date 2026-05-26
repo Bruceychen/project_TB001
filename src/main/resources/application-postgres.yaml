@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:tb001}
+    username: ${POSTGRES_USER:tb001}
+    password: ${POSTGRES_PASSWORD:tb001}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

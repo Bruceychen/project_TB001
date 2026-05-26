@@ -1,0 +1,28 @@
+# Dev-only tools stack — pgAdmin for DB inspection.
+# Not part of the application; load only when needed:
+#   docker compose -f docker-compose.yml -f docker-compose.tools.yml up -d
+#
+# Credentials below are placeholders. Override via .env or shell env:
+#   PGADMIN_EMAIL=you@example.com PGADMIN_PASSWORD=changeme docker compose ... up -d
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4:9
+    container_name: tb001_pgadmin
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-changeme}
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
+      PGADMIN_CONFIG_LOGIN_BANNER: "\"Authorised users only.\""
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: "10"
+    ports:
+      - "57362:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  pgadmin_data:
