@@ -1,0 +1,72 @@
+### TB001 API smoke test
+### Run top-to-bottom against a freshly-seeded DB (apply mockData.sql first).
+### IntelliJ HTTP Client format — click the green ▶ in the gutter, or run all.
+
+@host = http://localhost:8080
+
+### 1. Sanity — list users (mockData seeds 10)
+GET {{host}}/api/user
+
+### 2. Spec #1 — GET /api/product/{id}
+# product 2 = category 3C, unitPrice 1999.00, taxRate 0.10
+GET {{host}}/api/product/2
+
+### 3. Spec #2 — POST /api/order
+# totalCost = orderAmount × unitPrice × (1 + taxRate) = 2 × 1999 × 1.10 = 4397.80
+# captures the new orderId into a variable for the next requests
+POST {{host}}/api/order
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "productId": 2,
+  "orderAmount": 2
+}
+
+> {% client.global.set("orderId", response.body.orderId); %}
+
+### 4. Spec #6 — GET /api/order/{userId}
+# all of user 1's orders, each carrying a computed totalCost
+GET {{host}}/api/order/1
+
+### 5. Spec #3 — PATCH /api/order/{orderId}
+# bump amount to 5 → totalCost = 5 × 1999 × 1.10 = 10994.50
+PATCH {{host}}/api/order/{{orderId}}
+Content-Type: application/json
+
+{
+  "orderAmount": 5
+}
+
+### 6. Spec #4 — DELETE /api/order/{orderId}  → 204 No Content
+DELETE {{host}}/api/order/{{orderId}}
+
+### 7. Spec #5 — DELETE /api/user/{userId}  → 204, cascades to that user's orders
+DELETE {{host}}/api/user/5
+
+### ---------- error-path checks ----------
+
+### 8. 404 — product that does not exist
+GET {{host}}/api/product/9999
+
+### 9. 404 — orders for a non-existent user
+# spec #6 returns 404 (not an empty 200) by design — see assumptions.md §4
+GET {{host}}/api/order/9999
+
+### 10. 400 — validation failure (orderAmount < 1)
+POST {{host}}/api/order
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "productId": 2,
+  "orderAmount": 0
+}
+
+### ---------- supporting endpoints (not in spec; testing convenience) ----------
+
+### 11. List products
+GET {{host}}/api/product
+
+### 12. List categories
+GET {{host}}/api/category

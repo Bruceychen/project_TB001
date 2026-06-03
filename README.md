@@ -9,21 +9,27 @@ Java 21, Spring Boot 3.5.14, PostgreSQL 16.
 
 ### 1. Start PostgreSQL + pgAdmin
 
-'''bash
+~~~bash
 docker compose -f docker-compose.yml -f docker-compose.tools.yml up -d
-'''
+~~~
 
 Wait until both containers report healthy ('docker ps').
 
 ### 2. Run the application
 
-'''bash
+~~~bash
 ./mvnw spring-boot:run
-'''
+~~~
 
 Default Spring profile is 'postgres' (see 'application.yaml'). The app starts on 'http://localhost:8080'.
 
-**Database credentials.** 'application-postgres.yaml' reads 'POSTGRES_HOST' / 'POSTGRES_PORT' / 'POSTGRES_DB' / 'POSTGRES_USER' / 'POSTGRES_PASSWORD' from the environment, with safe local-dev defaults if the variables are not set. The app boots out-of-the-box against the bundled docker-compose Postgres without any env work; to override:
+**Database credentials.** 'application-postgres.yaml' reads 
+'POSTGRES_HOST' 
+'POSTGRES_PORT'  
+'POSTGRES_DB' 
+'POSTGRES_USER' 
+'POSTGRES_PASSWORD' 
+from the environment, with safe local-dev defaults if the variables are not set. The app boots out-of-the-box against the bundled docker-compose Postgres without any env work; to override:
 
 | Run mode | How to supply env |
 |---|---|
@@ -39,9 +45,9 @@ Real credentials live in '.env' (gitignored). '.env.example' documents the varia
 Open 'src/main/resources/api-test.http' in IntelliJ HTTP Client (or convert to curl) and run requests in order.
 
 > **Optional — mock data.** 'src/main/resources/mockData.sql' ships with 10 FK-safe rows per table and IDENTITY-sequence resets. Apply it after the Spring Boot app has booted at least once (so Hibernate 'ddl-auto: update' has created the tables) via pgAdmin, 'psql', or:
-> '''bash
+> ~~~bash
 > docker exec -i tb001_postgres psql -U tb001 -d tb001 < src/main/resources/mockData.sql
-> '''
+> ~~~
 
 ---
 
@@ -60,9 +66,9 @@ All endpoints align with the assignment spec.
 
 ### 'totalCost' formula
 
-'''
+~~~
 totalCost = order_amount × unit_price × (1 + tax_rate)
-'''
+~~~
 
 Computed at response time inside 'OrderService.toResponse()'. Not persisted on the Order row, to avoid stale-cache and update-anomaly issues if tax_rate or unit_price ever changes (see Order entity Javadoc).
 
@@ -81,7 +87,7 @@ These are not required by the spec — they exist so a tester can populate, insp
 
 ## Architecture
 
-'''
+~~~
 src/main/java/com/bruceychen/tb001/
 ├── ProjectTb001Application.java     (entry point, @EnableScheduling)
 ├── entity/                          (User, ProductCategory, Product, Order)
@@ -92,7 +98,7 @@ src/main/java/com/bruceychen/tb001/
 ├── exception/                       (ApiException base, ResourceNotFoundException)
 ├── event/                           (OrderCreatedEvent — see Design Q1)
 └── listener/                        (OrderNotificationListener — consumes OrderCreatedEvent)
-'''
+~~~
 
 ### Spring profile layout
 
@@ -102,17 +108,17 @@ src/main/java/com/bruceychen/tb001/
 
 To run with a different profile:
 
-'''bash
+~~~bash
 SPRING_PROFILES_ACTIVE=h2 ./mvnw spring-boot:run    # rare; mostly for local sandbox
-'''
+~~~
 
 ---
 
 ## Tests
 
-'''bash
+~~~bash
 ./mvnw test
-'''
+~~~
 
 Three layers:
 
