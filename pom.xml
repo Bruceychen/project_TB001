@@ -87,6 +87,12 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!-- GraalVM native image 支援：版本由 spring-boot-starter-parent 管理；
+			     搭配 parent 內建的 `native` profile，用 ./mvnw -Pnative native:compile 編原生執行檔 -->
+			<plugin>
+				<groupId>org.graalvm.buildtools</groupId>
+				<artifactId>native-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</build>
 
